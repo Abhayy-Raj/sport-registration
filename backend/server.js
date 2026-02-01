@@ -47,11 +47,12 @@ app.post("/register", async (req, res) => {
     }
 
     await pool.query(
-      `INSERT INTO users
-       (name, reg_id, phone, section, year)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [name, registrationId, phone, section, year]
-    );
+  `INSERT INTO users
+   (name, reg_id, phone, section, study_year)
+   VALUES ($1, $2, $3, $4, $5)`,
+  [name, registrationId, phone, section, year]
+);
+
 
     res.status(200).json({ message: "Registration successful" });
   } catch (error) {
