@@ -4,14 +4,17 @@ const pool = require("./db");
 const app = express();
 
 /* =========================
-   MANUAL CORS HEADERS (GUARANTEED)
+   MANUAL CORS (PRODUCTION-SAFE)
    ========================= */
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://sport-registration.netlify.app");
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://sport-registration.netlify.app"
+  );
   res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle preflight
+  // Handle preflight requests
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
@@ -19,10 +22,13 @@ app.use((req, res, next) => {
   next();
 });
 
+/* =========================
+   MIDDLEWARE
+   ========================= */
 app.use(express.json());
 
 /* =========================
-   TEST ROUTE
+   HEALTH CHECK ROUTE
    ========================= */
 app.get("/", (req, res) => {
   res.send("Backend is working");
@@ -35,16 +41,21 @@ app.post("/register", async (req, res) => {
   try {
     const { name, registrationId, phone, section, year } = req.body;
 
+    // Basic validation
+    if (!name || !registrationId || !phone || !section || !year) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     await pool.query(
-      `INSERT INTO users 
-       (name, registration_id, phone, section, year)
+      `INSERT INTO users
+       (name, reg_id, phone, section, year)
        VALUES ($1, $2, $3, $4, $5)`,
       [name, registrationId, phone, section, year]
     );
 
-    res.json({ message: "Registration successful" });
-  } catch (err) {
-    console.error(err);
+    res.status(200).json({ message: "Registration successful" });
+  } catch (error) {
+    console.error("DATABASE ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
