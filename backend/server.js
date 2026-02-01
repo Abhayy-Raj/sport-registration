@@ -1,43 +1,65 @@
 const express = require("express");
 const cors = require("cors");
-const pool = require("./db");
+const pool = require("./db"); // uses DATABASE_URL
 
 const app = express();
 
-// 🔴 VERY IMPORTANT — order matters
-app.use(cors({
-  origin: "https://sport-registration.netlify.app",
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"]
-}));
+/* =========================
+   CORS CONFIGURATION
+   ========================= */
+app.use(
+  cors({
+    origin: "https://sport-registration.netlify.app", // your Netlify URL
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 
+// Handle preflight requests explicitly
+app.options("*", cors());
+
+/* =========================
+   MIDDLEWARE
+   ========================= */
 app.use(express.json());
 
-// ✅ TEST ROUTE (this fixes Cannot GET /)
+/* =========================
+   TEST ROUTE
+   ========================= */
 app.get("/", (req, res) => {
-    res.send("Backend is working");
+  res.send("Backend is working");
 });
 
-// ✅ REGISTER ROUTE
+/* =========================
+   REGISTER ROUTE
+   ========================= */
 app.post("/register", async (req, res) => {
-    console.log("REQ BODY:", req.body); // DEBUG LOG
+  try {
+    const { name, registrationId, phone, section, year } = req.body;
 
-    const { name, regId, phone, section, year } = req.body;
-
-    try {
-        await pool.query(
-            `INSERT INTO users (name, reg_id, phone, section, year)
-             VALUES ($1, $2, $3, $4, $5)`,
-            [name, regId, phone, section, year]
-        );
-
-        res.json({ message: "Registration successful" });
-    } catch (err) {
-        console.error("DB ERROR:", err.message);
-        res.status(500).json({ message: "Database error" });
+    if (!name || !registrationId || !phone || !section || !year) {
+      return res.status(400).json({ message: "All fields are required" });
     }
+
+    await pool.query(
+      `INSERT INTO registrations 
+       (name, registration_id, phone, section, year)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [name, registrationId, phone, section, year]
+    );
+
+    res.status(200).json({ message: "Registration successful" });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-app.listen(5000, () => {
-    console.log("Server running on http://localhost:5000");
+/* =========================
+   START SERVER
+   ========================= */
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
