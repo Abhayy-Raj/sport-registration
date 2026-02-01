@@ -1,25 +1,41 @@
 console.log("JS LOADED");
-
 document.querySelector("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    e.preventDefault();
+  const name = document.getElementById("name").value.trim();
+  const registrationId = document.getElementById("registrationId").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const section = document.getElementById("section").value.trim();
+  const year = document.getElementById("year").value.trim();
 
-    const data = {
-        name: document.getElementById("name").value,
-        regId: document.getElementById("reg-id").value,
-        phone: document.getElementById("phone").value,
-        section: document.getElementById("section").value,
-        year: document.getElementById("year").value
-    };
-
-    const response = await fetch("https://sport-registration.onrender.com/register", {
+  try {
+    const response = await fetch(
+      "https://sport-registration.onrender.com/register",
+      {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(data)
-    });
+        body: JSON.stringify({
+          name,
+          registrationId,
+          phone,
+          section,
+          year,
+        }),
+      }
+    );
 
-    const result = await response.json();
-    alert(result.message);
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(data.message); // "Registration successful"
+      e.target.reset();
+    } else {
+      alert(data.message || "Something went wrong");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Network error");
+  }
 });
