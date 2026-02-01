@@ -5,12 +5,7 @@ const pool = require("./db");
 const app = express();
 
 // 🔴 VERY IMPORTANT — order matters
-app.use(cors({
-  origin: "https://sport-registration.netlify.app",
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"]
-}));
-
+app.use(cors());
 app.use(express.json());
 
 // ✅ TEST ROUTE (this fixes Cannot GET /)
@@ -38,6 +33,9 @@ app.post("/register", async (req, res) => {
     }
 });
 
-app.listen(5000, () => {
-    console.log("Server running on http://localhost:5000");
+const PORT = Number(process.env.PORT) || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
