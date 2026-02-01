@@ -1,22 +1,19 @@
 const express = require("express");
 const cors = require("cors");
-const pool = require("./db"); // uses DATABASE_URL
+const pool = require("./db");
 
 const app = express();
 
 /* =========================
-   CORS CONFIGURATION
+   CORS CONFIG (FIXED)
    ========================= */
 app.use(
   cors({
-    origin: "https://sport-registration.netlify.app", // your Netlify URL
-    methods: ["GET", "POST", "OPTIONS"],
+    origin: "https://sport-registration.netlify.app",
+    methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
 );
-
-// Handle preflight requests explicitly
-app.options("*", cors());
 
 /* =========================
    MIDDLEWARE
@@ -42,7 +39,7 @@ app.post("/register", async (req, res) => {
     }
 
     await pool.query(
-      `INSERT INTO registrations 
+      `INSERT INTO registrations
        (name, registration_id, phone, section, year)
        VALUES ($1, $2, $3, $4, $5)`,
       [name, registrationId, phone, section, year]
