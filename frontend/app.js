@@ -9,7 +9,7 @@ document.querySelector("form").addEventListener("submit", async (e) => {
   const year = document.getElementById("year").value.trim();
 
   try {
-    const response = await fetch("https://sport-registration.onrender.com",
+    const response = await fetch("https://sport-registration.onrender.com/register",
       {
         method: "POST",
         headers: {
