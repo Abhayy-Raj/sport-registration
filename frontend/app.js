@@ -12,7 +12,7 @@ document.querySelector("form").addEventListener("submit", async (e) => {
         year: document.getElementById("year").value
     };
 
-    const response = await fetch("https://sport-registration-backend.onrender.com/register", {
+    const response = await fetch("https://sport-registration.onrender.com/register", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
