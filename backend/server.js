@@ -36,7 +36,7 @@ app.post("/register", async (req, res) => {
     const { name, registrationId, phone, section, year } = req.body;
 
     await pool.query(
-      `INSERT INTO registrations 
+      `INSERT INTO users 
        (name, registration_id, phone, section, year)
        VALUES ($1, $2, $3, $4, $5)`,
       [name, registrationId, phone, section, year]
